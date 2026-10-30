@@ -82,7 +82,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
 .tabs {
   display: flex; gap: 4px; padding: 4px; border-radius: 999px;
   background: var(--ink); border: 1.5px solid var(--line);
-  flex: 1 1 auto; max-width: 560px; margin-inline: auto; min-width: 0;
+  flex: 1 1 auto; max-width: 740px; margin-inline: auto; min-width: 0;
 }
 .tab {
   flex: 1 1 0; min-width: 0; border: 0; border-radius: 999px; background: transparent;
@@ -95,6 +95,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
 .tab[data-m="P"][aria-selected="true"] { background: var(--moss); }
 .tab[data-m="E"][aria-selected="true"] { background: var(--violet); }
 .tab[data-m="Z"][aria-selected="true"] { background: var(--rust); }
+.tab[data-m="G"][aria-selected="true"] { background: var(--blood-deep); }
 .right { display: flex; align-items: center; gap: 10px; }
 .timer {
   display: flex; align-items: center; gap: 10px;
@@ -159,6 +160,17 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
 .lv .num { font-family: var(--f-label); font-weight: 900; font-size: clamp(48px, 7vw, 86px); line-height: .9; color: var(--bone); }
 .lv .candies { display: flex; gap: 2px; }
 .lv .candies svg { width: clamp(18px, 2.4vw, 28px); height: auto; }
+.lv.game { display: none; background: var(--l1); }
+.levels.solo { grid-template-rows: 1fr; }
+.levels.solo .lv[data-l] { display: none; }
+.levels.solo .lv.game { display: grid; }
+.lv.game svg.dice { width: clamp(54px, 8vw, 96px); height: auto; color: var(--bone); }
+.lv.game .gl { font-family: var(--f-label); font-weight: 900; font-size: clamp(15px, 1.9vw, 22px); letter-spacing: .5px; line-height: 1.15; text-align: center; padding: 0 8px; }
+.sub { font-size: clamp(18px, 2.6vw, 30px); color: var(--bone-dim); margin-top: 14px; text-wrap: balance; padding: 0 6%; line-height: 1.3; }
+.art { display: flex; justify-content: center; margin-bottom: clamp(6px, 1.5vh, 16px); }
+.art svg { width: min(100%, 460px); height: clamp(120px, 30vh, 280px); }
+.card.covered .art { filter: blur(22px); opacity: .5; }
+.card.covered .sub { filter: blur(22px); opacity: .5; }
 .lv .left { position: absolute; bottom: 8px; right: 12px; font-size: 12px; font-weight: 700; opacity: .85; font-variant-numeric: tabular-nums; }
 
 /* Einstellungen */
@@ -174,6 +186,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .seg button { border: 1.5px solid var(--line); background: var(--ink); border-radius: 999px; padding: 9px 14px; font-weight: 700; }
 .seg button[aria-pressed="true"] { background: var(--blood); color: var(--bone); border-color: var(--blood); }
+.grid9 .wide { grid-column: 2 / -1; }
 .grid9 { display: grid; grid-template-columns: auto repeat(3, 1fr); gap: 6px; align-items: center; font-size: 13px; }
 .grid9 .h { color: var(--bone-dim); font-weight: 700; text-align: center; }
 .grid9 .rl { font-weight: 700; padding-right: 6px; }
@@ -184,6 +197,9 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
 .msg.err { color: #ff7a7f; }
 .confirm { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; background: var(--ink); border-radius: 14px; padding: 10px 12px; font-size: 14px; }
 
+@media (max-width: 1100px) {
+  .tab { padding: 10px 8px; gap: 6px; font-size: clamp(13px, 1.5vw, 16px); }
+}
 @media (max-width: 760px) {
   .tabs { order: 3; flex-basis: 100%; max-width: none; }
   .tab svg { display: none; }
@@ -214,6 +230,10 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5l4 4L8 20l-5 1 1-5z"/><path d="M14 6l4 4"/></svg>
         Zeichnen
       </button>
+      <button class="tab" role="tab" data-m="G" type="button" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="2.6"/><circle cx="16" cy="7" r="2.6"/><path d="M3 20v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2M13.5 14.3A4 4 0 0 1 15 14h2a4 4 0 0 1 4 4v2"/></svg>
+        Gruppenspiel
+      </button>
     </div>
     <div class="right">
       <div class="timer" id="timer">
@@ -229,7 +249,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
   <main class="stage">
     <button class="card" id="card" type="button" aria-live="polite">
       <div class="level-tag" id="levelTag"></div>
-      <div class="word idle" id="word">Tippe rechts auf 1, 2 oder 3</div>
+      <div class="mid"><div class="art" id="art" hidden></div><div class="word idle" id="word">Tippe rechts auf 1, 2 oder 3</div><div class="sub" id="sub" hidden></div></div>
       <div class="hint" id="hint"></div>
     </button>
   </main>
@@ -238,6 +258,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
     <button class="lv" data-l="1" type="button" aria-label="Stufe 1 ziehen"><span class="num">1</span><span class="candies"></span><span class="left" id="left1"></span></button>
     <button class="lv" data-l="2" type="button" aria-label="Stufe 2 ziehen"><span class="num">2</span><span class="candies"></span><span class="left" id="left2"></span></button>
     <button class="lv" data-l="3" type="button" aria-label="Stufe 3 ziehen"><span class="num">3</span><span class="candies"></span><span class="left" id="left3"></span></button>
+    <button class="lv game" id="gameBtn" type="button" aria-label="Zufälliges Gruppenspiel ziehen"><svg class="dice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="8.5" cy="8.5" r="1.4" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.4" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.4" fill="currentColor"/></svg><span class="gl">Spiel<br>ziehen</span><span class="left" id="leftG"></span></button>
   </nav>
 </div>
 
@@ -256,7 +277,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
 
     <div>
       <h3>Eigene Liste aus Numbers laden</h3>
-      <p>Die Tabelle hat 9 Spalten: Pantomime 1–3, Erklären 1–3, Zeichnen 1–3. In Numbers über <b>Teilen → Exportieren → CSV</b> in „Dateien“ sichern und hier auswählen.</p>
+      <p>Die Tabelle hat 10 Spalten: Pantomime 1–3, Erklären 1–3, Zeichnen 1–3 und Gruppenspiele. In der Spalte Gruppenspiele steht nur der Name des Spiels. In Numbers über <b>Teilen → Exportieren → CSV</b> in „Dateien“ sichern und hier auswählen.</p>
       <div class="row" style="margin-top:10px">
         <label class="pill" for="csvInput" style="cursor:pointer">CSV-Datei wählen</label>
         <input id="csvInput" type="file" accept=".csv,.txt,text/csv,text/plain" hidden>
@@ -281,7 +302,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
 
     <div>
       <h3>Neues Spiel</h3>
-      <p>Gezeigte Begriffe kommen erst wieder, wenn eine Liste einmal komplett durch ist. Für ein neues Spiel alles neu mischen.</p>
+      <p>Gezeigte Begriffe und Spiele kommen erst wieder, wenn eine Liste einmal komplett durch ist. Für ein neues Spiel alles neu mischen.</p>
       <div class="row" style="margin-top:10px">
         <button class="pill ghost" id="resetBtn" type="button">Alle Begriffe neu mischen</button>
       </div>
@@ -299,35 +320,140 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
   "use strict";
 
   var MODES = ["P", "E", "Z"];
-  var MODE_NAME = { P: "Pantomime", E: "Erklären", Z: "Zeichnen" };
+  var TABS = ["P", "E", "Z", "G"];
+  var MODE_NAME = { P: "Pantomime", E: "Erklären", Z: "Zeichnen", G: "Gruppenspiel" };
   var MODE_SHADES = {
     P: ["#3b6b30", "#284d21", "#1a3315"],
     E: ["#4d3170", "#36214f", "#241536"],
-    Z: ["#9c4215", "#7e330e", "#5a2309"]
+    Z: ["#9c4215", "#7e330e", "#5a2309"],
+    G: ["#8a1712", "#650b10", "#45070b"]
   };
+  var DEFAULT_GAMES = ["Becher-Flip", "Flaschen-Klo", "Aufsetzer", "Ballon-Lift", "Stäbchen-Taxi", "Katapult"];
+  // ---------- Bilder zu den Gruppenspielen (SVG mit Animation) ----------
+  var C = { b: "#dcd2b6", d: "#9a917e", r: "#b3221c", o: "#e07a2a", g: "#7fae5a", v: "#36214f", k: "#0b090e" };
+  var SW = 'stroke="' + C.b + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"';
+  function svg(inner) { return '<svg viewBox="0 0 320 210" role="img" aria-hidden="true">' + inner + "</svg>"; }
+  function A(attr, values, times, dur, extra) {
+    return '<animate attributeName="' + attr + '" values="' + values + '" keyTimes="' + times + '" dur="' + dur + '" repeatCount="indefinite"' + (extra || "") + "/>";
+  }
+  function T(type, values, times, dur, extra) {
+    return '<animateTransform attributeName="transform" type="' + type + '" values="' + values + '" keyTimes="' + times + '" dur="' + dur + '" repeatCount="indefinite"' + (extra || "") + "/>";
+  }
+  function candy(x, y, col) {
+    return '<g transform="translate(' + x + "," + y + ')"><path d="M-7,0 L-13,-5 L-13,5 Z M7,0 L13,-5 L13,5 Z" fill="' + col + '" opacity=".85"/>' +
+      '<ellipse rx="8" ry="6" fill="' + col + '" stroke="' + C.k + '" stroke-width="1.5"/></g>';
+  }
+  function stars(x, y, t0, dur) {
+    var o = A("opacity", "0;0;1;0;0", "0;" + t0 + ";" + (t0 + 0.04).toFixed(2) + ";" + (t0 + 0.14).toFixed(2) + ";1", dur);
+    return '<g opacity="0" ' + SW.replace('stroke-width="4"', 'stroke-width="3"').replace(C.b, C.o) + ">" + o +
+      '<path d="M' + x + "," + (y - 22) + " v-10 M" + (x - 18) + "," + (y - 14) + " l-8,-7 M" + (x + 18) + "," + (y - 14) + ' l8,-7"/></g>';
+  }
+  var ART = {
+    flip: { who: "Einer aus dem Team", svg: svg(
+      '<g ' + SW + '><path d="M20,172 H214 M40,172 V204 M194,172 V204"/></g>' +
+      '<g fill="' + C.r + '" stroke="' + C.b + '" stroke-width="3" stroke-linejoin="round">' +
+      '<path d="M46,172 L74,172 L70,132 L50,132 Z"/><path d="M94,172 L122,172 L118,132 L98,132 Z"/></g>' +
+      '<g>' + T("translate", "200 152;200 152;190 92;176 152;176 152", "0;0.2;0.38;0.55;1", "3s") +
+      '<g>' + T("rotate", "0;0;110;180;180", "0;0.2;0.38;0.55;1", "3s", ' additive="sum"') +
+      '<path d="M-14,-20 L14,-20 L10,20 L-10,20 Z" fill="' + C.r + '" stroke="' + C.b + '" stroke-width="3" stroke-linejoin="round"/>' +
+      '<path d="M-12,-12 H12" stroke="' + C.b + '" stroke-width="2" opacity=".5"/></g></g>' +
+      '<g ' + SW + '>' + T("translate", "0 0;0 0;0 -12;0 0;0 0", "0;0.16;0.22;0.3;1", "3s") +
+      '<path d="M236,206 C232,192 222,184 214,176" /></g>' +
+      '<g opacity="0" stroke="' + C.d + '" stroke-width="2.5" fill="none" stroke-dasharray="3 6">' + A("opacity", "0;0;1;0;0", "0;0.22;0.3;0.5;1", "3s") +
+      '<path d="M222,142 C224,104 206,80 186,82"/></g>' + stars(176, 132, 0.56, "3s")) },
+
+    bottle: { who: "Einer aus dem Team", svg: svg(
+      '<g ' + SW + '><path d="M60,196 H260"/><circle cx="160" cy="24" r="12"/><path d="M160,36 V95 M160,95 L128,195 M160,95 L192,195"/>' +
+      '<path d="M160,48 L138,40 L148,16 M160,48 L182,40 L172,16"/></g>' +
+      '<g>' + T("rotate", "22 160 95;-17 160 95;12 160 95;-7 160 95;3 160 95;0 160 95;0 160 95", "0;0.13;0.26;0.39;0.52;0.62;1", "4s",
+        ' calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1;0 0 1 1"') +
+      '<line x1="160" y1="95" x2="160" y2="128" stroke="' + C.d + '" stroke-width="2.5">' + A("y2", "128;128;142;142", "0;0.66;0.8;1", "4s") + '</line>' +
+      '<g>' + T("translate", "0 0;0 0;0 14;0 14", "0;0.66;0.8;1", "4s") +
+      '<rect x="156" y="127" width="8" height="18" rx="2.5" fill="' + C.o + '" stroke="' + C.k + '" stroke-width="1.5"/><path d="M156,145 L160,152 L164,145 Z" fill="' + C.b + '"/></g></g>' +
+      '<path d="M153,146 L153,160 Q140,165 140,176 L140,195 L180,195 L180,176 Q180,165 167,160 L167,146 Z" fill="#284d21" fill-opacity=".92" stroke="' + C.b + '" stroke-width="3" stroke-linejoin="round"/>' +
+      stars(160, 150, 0.8, "4s")) },
+
+    bounce: { who: "Einer aus dem Team", svg: svg(
+      '<g ' + SW + '><path d="M10,176 H310"/><path d="M-4,118 L30,92" /></g>' +
+      '<path d="M38,84 Q95,40 150,170 Q200,40 255,140" stroke="' + C.d + '" stroke-width="2.5" fill="none" stroke-dasharray="3 7" opacity=".7"/>' +
+      '<circle r="7" fill="#f4efe0" stroke="' + C.k + '" stroke-width="1.5"><animateMotion dur="2.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;1;1" keyTimes="0;0.62;1" path="M38,84 Q95,40 150,169 Q200,40 255,140 L255,152"/></circle>' +
+      '<g opacity="0" stroke="' + C.o + '" stroke-width="3" stroke-linecap="round" fill="none">' + A("opacity", "0;0;1;0;0", "0;0.27;0.3;0.4;1", "2.6s") +
+      '<path d="M134,170 l-10,-6 M166,170 l10,-6 M150,160 v-10"/></g>' +
+      '<path d="M240,132 L270,132 L265,175 L245,175 Z" fill="' + C.r + '" stroke="' + C.b + '" stroke-width="3" stroke-linejoin="round"/>' +
+      stars(255, 126, 0.64, "2.6s")) },
+
+    balloon: { who: "Zu zweit", svg: svg(
+      '<g ' + SW + '><path d="M30,192 H290"/>' +
+      '<circle cx="120" cy="38" r="12"/><path d="M120,50 V128 M120,128 L106,190 M120,128 L127,190 M120,64 L102,96 L108,110"/>' +
+      '<circle cx="200" cy="38" r="12"/><path d="M200,50 V128 M200,128 L214,190 M200,128 L193,190 M200,64 L218,96 L212,110"/></g>' +
+      '<circle cx="126" cy="36" r="2" fill="' + C.b + '"/><circle cx="194" cy="36" r="2" fill="' + C.b + '"/>' +
+      '<g>' + T("translate", "160 152;160 152;160 82;160 82;160 152", "0;0.08;0.62;0.88;1", "4.4s", ' calcMode="spline" keySplines="0 0 1 1;.4 0 .6 1;0 0 1 1;.4 0 .6 1"') +
+      '<g>' + T("rotate", "-4;4;-4", "0;0.5;1", "1.1s", ' additive="sum"') +
+      '<ellipse rx="37" ry="40" fill="' + C.o + '" stroke="' + C.k + '" stroke-width="2"/><ellipse cx="-13" cy="-16" rx="7" ry="11" fill="#fff" opacity=".25"/>' +
+      '<path d="M-4,40 L4,40 L0,46 Z" fill="' + C.o + '"/></g></g>' +
+      '<g stroke="' + C.d + '" stroke-width="3" stroke-linecap="round" fill="none" opacity=".8"><path d="M50,160 V90 M40,102 L50,90 L60,102 M270,160 V90 M260,102 L270,90 L280,102"/></g>') },
+
+    sticks: { who: "Zu zweit", svg: svg(
+      '<g ' + SW + '><path d="M10,196 H310"/></g>' +
+      '<path d="M32,170 Q70,206 108,170 Z" fill="' + C.v + '" stroke="' + C.b + '" stroke-width="3" stroke-linejoin="round"/>' +
+      '<path d="M212,170 Q250,206 288,170 Z" fill="' + C.v + '" stroke="' + C.b + '" stroke-width="3" stroke-linejoin="round"/>' +
+      candy(58, 172, C.g) + candy(84, 174, C.r) +
+      '<g opacity="0">' + A("opacity", "0;0;1;1", "0;0.74;0.75;1", "4s") + candy(250, 172, C.o) + "</g>" +
+      '<g>' + T("translate", "70 150;70 108;250 108;250 152;250 152", "0;0.18;0.58;0.74;1", "4s", ' calcMode="spline" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1;0 0 1 1"') +
+      A("opacity", "0;1;1;0", "0;0.06;0.9;1", "4s") +
+      '<g>' + A("opacity", "1;1;0;0", "0;0.74;0.75;1", "4s") + candy(0, 6, C.o) + "</g>" +
+      '<path d="M-56,-78 L-5,0 M56,-78 L5,0" stroke="#c8a46a" stroke-width="5" stroke-linecap="round"/>' +
+      '<circle cx="-58" cy="-82" r="10" fill="' + C.b + '"/><circle cx="58" cy="-82" r="10" fill="' + C.o + '"/></g>') },
+
+    catapult: { who: "Zu zweit", svg: svg(
+      '<g ' + SW + '><path d="M10,192 H310"/>' +
+      '<circle cx="58" cy="58" r="12"/><path d="M58,70 V130 M58,130 L46,190 M58,130 L70,190 M58,84 L82,112 L98,124"/>' +
+      '<circle cx="262" cy="58" r="12"/><path d="M262,70 V130 M262,130 L250,190 M262,130 L274,190 M262,84 L238,112 L222,124"/></g>' +
+      '<path d="M106,84 Q160,-46 214,84" stroke="' + C.d + '" stroke-width="2.5" fill="none" stroke-dasharray="3 7" opacity=".6"/>' +
+      '<circle r="8" fill="#f4efe0" stroke="' + C.k + '" stroke-width="1.5"><animateMotion dur="3.6s" repeatCount="indefinite" calcMode="linear" keyPoints="0;0;1;1;0;0" keyTimes="0;0.08;0.4;0.55;0.87;1" path="M106,84 Q160,-46 214,84"/></circle>' +
+      '<g>' + T("translate", "0 0;0 0;0 -6;0 0;0 0", "0;0.06;0.08;0.12;1", "3.6s") + '<g transform="translate(104,100) rotate(14)"><path d="M-6,8 L6,8 L5,34 L-5,34 Z" fill="#2f6fd0" stroke="#0b090e" stroke-width="1.5"/><path d="M5,14 L13,20 L5,24" fill="#2f6fd0" stroke="#0b090e" stroke-width="1.5"/><path d="M-24,-32 L24,-32 L8,8 L-8,8 Z" fill="#e8c33a" fill-opacity=".18" stroke="#e8c33a" stroke-width="3.5" stroke-linejoin="round"/><path d="M-16,-12 H16 M-20,-22 H20 M-8,-32 L-4,8 M8,-32 L4,8 M0,-32 V8" stroke="#e8c33a" stroke-width="2.2" fill="none"/></g>' + '</g>' +
+      '<g>' + T("translate", "0 0;0 0;0 -6;0 0;0 0", "0;0.53;0.55;0.59;1", "3.6s") + '<g transform="translate(216,100) rotate(-14)"><path d="M-6,8 L6,8 L5,34 L-5,34 Z" fill="#e07a2a" stroke="#0b090e" stroke-width="1.5"/><path d="M5,14 L13,20 L5,24" fill="#e07a2a" stroke="#0b090e" stroke-width="1.5"/><path d="M-24,-32 L24,-32 L8,8 L-8,8 Z" fill="#8fd14f" fill-opacity=".18" stroke="#8fd14f" stroke-width="3.5" stroke-linejoin="round"/><path d="M-16,-12 H16 M-20,-22 H20 M-8,-32 L-4,8 M8,-32 L4,8 M0,-32 V8" stroke="#8fd14f" stroke-width="2.2" fill="none"/></g>' + '</g>' +
+      stars(222, 66, 0.4, "3.6s") + stars(98, 66, 0.87, "3.6s")) },
+
+    dice: { who: "", svg: svg(
+      '<g transform="translate(160,105)"><g>' + T("rotate", "-8;8;-8", "0;0.5;1", "2.4s") +
+      '<rect x="-48" y="-48" width="96" height="96" rx="20" fill="' + C.r + '" stroke="' + C.b + '" stroke-width="4"/>' +
+      '<g fill="' + C.b + '"><circle cx="-22" cy="-22" r="8"/><circle cx="22" cy="-22" r="8"/><circle r="8"/><circle cx="-22" cy="22" r="8"/><circle cx="22" cy="22" r="8"/></g></g></g>') }
+  };
+  function artFor(title) {
+    var t = (title || "").toLowerCase();
+    if (/flip/.test(t)) return ART.flip;
+    if (/flasch|klo/.test(t)) return ART.bottle;
+    if (/aufsetz|ping|pong/.test(t)) return ART.bounce;
+    if (/ballon/.test(t)) return ART.balloon;
+    if (/stäbchen|staebchen|stäbchen/.test(t)) return ART.sticks;
+    if (/katapult/.test(t)) return ART.catapult;
+    return ART.dice;
+  }
+
   var LEVEL_NAME = { 1: "leicht", 2: "mittel", 3: "knifflig" };
 
   // ---------- Standardliste: 3 Disziplinen × 3 Stufen ----------
   var DEFAULT = {
     P: {
-      1: ["Zombie","Vampir","Mumie","Gespenst","Fledermaus","Werwolf","Skelett","Spinne","Schwarze Katze","Hexe auf dem Besen","Kürbis schnitzen","Süßigkeiten essen","Jemanden erschrecken","Zittern vor Angst","Laut schreien","An die Tür klopfen","Kerze auspusten","Sarg öffnen","Eule","Rabe","Maske aufsetzen","Umhang schwingen","Knochen abnagen","Mit der Taschenlampe suchen","Wie eine Spinne krabbeln","Den Mond anheulen","Grab schaufeln","Zaubertrank rühren","Monster","Spuken"],
-      2: ["Süßes oder Saures","Frankenstein","Dracula","Sensenmann","Vogelscheuche","Geisterbahn fahren","Kostüm anziehen","Zauberspruch aufsagen","Vampirbiss","Im Spinnennetz festhängen","Mumie wickeln","Schweren Kürbis tragen","Gruselclown","Mit Knoblauch abwehren","Geist geht durch die Wand","Schlafwandeln","Horrorfilm schauen","Halloween-Party tanzen","Hinter dem Sofa verstecken","Im Nebel tasten","Hexe kichert","Zombie kriecht aus dem Grab","Kerze im Wind schützen","Kettensäge","Wolf wird zum Werwolf","Fledermaus hängt kopfüber","Bonbons verteilen","Sich als Geist verkleiden","Gruselig lachen","Hexe fällt vom Besen"],
-      3: ["Poltergeist","Voodoo-Puppe","Ouija-Brett","Wahrsagerin mit Kristallkugel","Lebendig begraben","Besessenheit","Thriller-Tanz","Kopfloser Reiter","Geisterjäger","Totengräber","Holzpflock in den Sarg","Zombie-Apokalypse","Jumpscare","Leichenstarre","Vampir ohne Spiegelbild","Bloody Mary im Spiegel","Séance","Exorzismus","Ghostbusters","Addams Family","Wednesday-Tanz","Escape Room","Geisterstunde","Werwolf bei Vollmond","Apfeltauchen","Kürbis zertreten","Spinnenbiss","Schlafparalyse","Verfluchte Puppe","Vampir verbrennt in der Sonne"]
+      1: ["Zombie", "Vampir", "Mumie", "Gespenst", "Fledermaus", "Werwolf", "Skelett", "Spinne", "Schwarze Katze", "Hexe auf dem Besen", "Kürbis schnitzen", "Süßigkeiten essen", "Jemanden erschrecken", "Zittern vor Angst", "Laut schreien", "An die Tür klopfen", "Kerze auspusten", "Sarg öffnen", "Eule", "Rabe", "Maske aufsetzen", "Umhang schwingen", "Knochen abnagen", "Mit der Taschenlampe suchen", "Wie eine Spinne krabbeln", "Den Mond anheulen", "Grab schaufeln", "Zaubertrank rühren", "Monster", "Spuken", "Ratte", "Schlange", "Fauchende Katze", "Wolf", "Pirat", "Clown", "Roboter", "Teufel", "Engel", "Zauberer", "Ritter", "Prinzessin", "Auf Zehenspitzen schleichen", "Sich verstecken", "Weglaufen", "Stolpern und hinfallen", "Unter die Decke kriechen", "Licht anschalten", "Klingel drücken", "Bonbon auswickeln", "Lolli lutschen", "Kaugummi kauen", "Popcorn essen", "Apfel essen", "Kürbis tragen", "Kerze anzünden", "Spinnennetz wegwischen", "Sich schminken", "Perücke aufsetzen", "Zähne fletschen", "Krallen zeigen", "Mit dem Zauberstab zaubern", "Fliegen", "Tanzen", "Schnarchen", "Blut trinken", "In den Spiegel schauen", "Gruselgesicht machen", "Selfie machen", "Kekse backen", "Treppe hochschleichen", "Fenster aufreißen", "Tür zuknallen", "Schlüssel umdrehen", "Sich umdrehen und erschrecken", "Gähnen", "Sich die Augen reiben", "Frieren", "Im Dunkeln tasten", "Schmetterling fangen", "Ins Bett gehen", "Aufwachen", "Zähne putzen", "Mit dem Besen fegen", "Holz hacken", "Feuer machen", "Hände wärmen", "Suppe löffeln", "Frosch", "Krähe", "Kranker Zombie", "Hexe kocht", "Pilze sammeln", "Kopfschmerzen", "Bauchweh von zu viel Süßem", "Wackelzahn", "Huhn", "Esel", "Spinne im Haar"],
+      2: ["Süßes oder Saures", "Frankenstein", "Dracula", "Sensenmann", "Vogelscheuche", "Geisterbahn fahren", "Kostüm anziehen", "Zauberspruch aufsagen", "Vampirbiss", "Im Spinnennetz festhängen", "Mumie wickeln", "Schweren Kürbis tragen", "Gruselclown", "Mit Knoblauch abwehren", "Geist geht durch die Wand", "Schlafwandeln", "Horrorfilm schauen", "Halloween-Party tanzen", "Hinter dem Sofa verstecken", "Im Nebel tasten", "Hexe kichert", "Zombie kriecht aus dem Grab", "Kerze im Wind schützen", "Kettensäge", "Wolf wird zum Werwolf", "Fledermaus hängt kopfüber", "Bonbons verteilen", "Sich als Geist verkleiden", "Gruselig lachen", "Hexe fällt vom Besen", "Sarg zunageln", "Spinne von der Schulter schnippen", "Durch ein Spukhaus schleichen", "Tür klemmt", "Kerze geht aus", "Taschenlampe flackert", "Sich im Spiegel nicht sehen", "Vampir schläft im Sarg", "Mumie verliert ihre Binden", "Skelett fällt auseinander", "Zombie verliert einen Arm", "Hexe verflucht jemanden", "Kristallkugel befragen", "Karten legen", "Glas mit Augäpfeln", "Spinnenbeine zählen", "Gift ins Glas kippen", "Kürbis zertreten", "Apfeltauchen", "Von Fledermäusen verfolgt", "Rückwärts gehen vor Angst", "Gespenst im Bettlaken", "Kopfloser Ritter", "Grabstein lesen", "Ketten rasseln", "Schaukelstuhl knarrt", "Puppe bewegt sich", "Kühlschrank öffnen und erschrecken", "Unter das Bett schauen", "Mit Taschenlampe unterm Kinn erzählen", "Lagerfeuer-Gruselgeschichte", "Monster unter dem Bett", "Schlotternde Knie", "Kostüm reißt", "Make-up verschmiert", "Zu viele Süßigkeiten", "Zombie-Walk", "Vampir verwandelt sich in Fledermaus", "Hexenbesen startet nicht", "Zauberer zieht Hase aus dem Hut", "Fluch abschütteln", "Totengräber bei der Arbeit", "Leiche verstecken", "Im Sarg gefangen", "Werwolf kratzt sich am Ohr", "Hund bellt den Geist an", "Geist kitzelt jemanden", "Spinnennetz im Gesicht", "Ins Dunkle springen", "Party-Polonaise", "Kürbislaterne tragen", "Ins Spukschloss klopfen", "Stromausfall", "Telefon klingelt um Mitternacht", "Zombie-Wettrennen", "Tarantel auf der Hand", "Gruselmaske abnehmen", "Schaurig singen", "Sich vor Lachen gruseln", "Eiskalte Hand", "Vampir trinkt Tomatensaft", "Fledermaus im Haar", "Halloween-Deko aufhängen", "Sternschnuppe im Nebel", "Rabe pickt", "Schwarze Katze kreuzt den Weg", "Mumie tanzt", "Gespenst erschreckt sich selbst", "Kürbis rollt weg"],
+      3: ["Poltergeist", "Voodoo-Puppe", "Ouija-Brett", "Wahrsagerin mit Kristallkugel", "Lebendig begraben", "Besessenheit", "Thriller-Tanz", "Kopfloser Reiter", "Geisterjäger", "Totengräber", "Holzpflock in den Sarg", "Zombie-Apokalypse", "Jumpscare", "Leichenstarre", "Vampir ohne Spiegelbild", "Bloody Mary im Spiegel", "Séance", "Exorzismus", "Ghostbusters", "Addams Family", "Wednesday-Tanz", "Escape Room", "Geisterstunde", "Werwolf bei Vollmond", "Spinnenbiss", "Schlafparalyse", "Verfluchte Puppe", "Vampir verbrennt in der Sonne", "Kürbis-Bowling", "Halloween-Kater", "Gruppenkostüm", "Zombie im Supermarkt", "Vampir beim Zahnarzt", "Mumie in der Waschanlage", "Hexe im Flugzeug", "Werwolf beim Friseur", "Skelett im Fitnessstudio", "Geist im Homeoffice", "Frankenstein lernt laufen", "Dracula beim Blutspenden", "Sensenmann macht Feierabend", "Zombie beim Date", "Hexe parkt den Besen ein", "Gespenst hat Schluckauf", "Grusel-Selfie mit Geist", "Horrorfilm mit Freunden", "Klingelstreich an Halloween", "Escape aus dem Sarg", "Kettensägen-Jongleur", "Clown im Gully", "Spuk-Hotel einchecken", "Geister-Hochzeit", "Totenkopf-Tattoo stechen", "Werwolf-Verwandlung", "Monster-Casting", "Exorzist am Telefon", "Zombie-Yoga", "Vampir-Speeddating", "Mumie auf Klopapier-Jagd", "Hexenprozess", "Lebendige Vogelscheuche", "Puppe dreht den Kopf", "Geist schreibt auf beschlagener Scheibe", "Gänsehaut beim Podcast", "Spinnweben-Parcours", "Spieluhr im Dunkeln", "Nachts im Museum", "Geisterschiff", "Irrlicht im Moor", "Schlafwandler auf dem Dach", "Michael Jacksons Moonwalk als Zombie", "Gruselkabinett", "Bermudadreieck", "Kürbis-Kopf-Kostüm", "Pumpkin Spice Latte", "Kürbis-Wettschnitzen", "Edward mit der Schere", "Hexe vergisst Zauberspruch", "Zombie-Marathon", "Friedhofsführung bei Nacht", "Spinne in der Badewanne", "Vampir mit Sonnenbrand", "Geisterbahn bleibt stehen", "Hexenkessel kocht über", "Leichenschmaus", "Mumie gibt Autogramme", "Skelett spielt Xylophon", "Zombie-Fußball", "Vampirjäger mit Armbrust", "Spiegel zerbricht", "Grabräuber", "Monster im Schrank", "Halloween-Umzug", "Werwolf-Rudel jagt", "Fledermaus-Formation", "Verhexter Staubsauger", "Vampir verschläft den Sonnenuntergang", "Geist will umarmt werden", "Zombie bestellt Pizza"]
     },
     E: {
-      1: ["Kürbis","Geist","Hexe","Vampir","Skelett","Fledermaus","Spinne","Besen","Sarg","Friedhof","Mumie","Zombie","Werwolf","Kerze","Vollmond","Grabstein","Süßigkeiten","Kostüm","Maske","Totenkopf","Hexenhut","Zauberstab","Kessel","Monster","Knochen","Nebel","Gift","Laterne","Rabe","Blut"],
-      2: ["Spinnennetz","Spukhaus","Geisterbahn","Zaubertrank","Gänsehaut","Albtraum","Mitternacht","Gruft","Knoblauch","Fangzähne","Kürbissuppe","Halloween-Party","Vogelscheuche","Sensenmann","Frankenstein","Dracula","Gruselclown","Fluch","Gruselgeschichte","Horrorfilm","Taschenlampe","Schwarze Katze","Wahrsagerin","Kristallkugel","Süßes oder Saures","Kürbiskerne","Totengräber","Leichenwagen","Geisterstunde","Fledermausflügel"],
-      3: ["Poltergeist","Ouija-Brett","Voodoo-Puppe","Exorzismus","Séance","Besessenheit","Irrlicht","Schlafparalyse","Déjà-vu","Día de los Muertos","Jumpscare","Pumpkin Spice Latte","Zombie-Apokalypse","Halloween-Kater","Gruppenkostüm","True-Crime-Podcast","Escape Room","Bermudadreieck","Lebendig begraben","Silberkugel","Holzpflock","Verfluchte Puppe","Geisterjäger","Kopfloser Reiter","Bloody Mary","Stranger Things","Addams Family","Freitag der 13.","Hexenprozess","Horror-Marathon"]
+      1: ["Kürbis", "Geist", "Hexe", "Vampir", "Skelett", "Fledermaus", "Spinne", "Besen", "Sarg", "Friedhof", "Mumie", "Zombie", "Werwolf", "Kerze", "Vollmond", "Grabstein", "Süßigkeiten", "Kostüm", "Maske", "Totenkopf", "Hexenhut", "Zauberstab", "Kessel", "Monster", "Knochen", "Nebel", "Gift", "Laterne", "Rabe", "Blut", "Eule", "Katze", "Ratte", "Wolf", "Mond", "Nacht", "Dunkelheit", "Angst", "Schrei", "Gruft", "Keller", "Dachboden", "Spukhaus", "Schloss", "Kreuz", "Teufel", "Engel", "Zauberer", "Pirat", "Clown", "Puppe", "Kette", "Schlüssel", "Tür", "Fenster", "Spiegel", "Taschenlampe", "Feuer", "Rauch", "Apfel", "Bonbon", "Lutscher", "Schokolade", "Popcorn", "Kekse", "Kuchen", "Suppe", "Party", "Herbst", "Oktober", "Blätter", "Wald", "Baum", "Moor", "Sumpf", "Kirche", "Glocke", "Uhr", "Mitternacht", "Albtraum", "Bett", "Decke", "Schatten", "Wind", "Sturm", "Blitz", "Donner", "Kälte", "Gänsehaut", "Zähne", "Krallen", "Auge", "Schädel", "Grab", "Leiche", "Krähe", "Schlange", "Frosch", "Pilz"],
+      2: ["Spinnennetz", "Geisterbahn", "Zaubertrank", "Albtraumfänger", "Mitternachtsglocke", "Fangzähne", "Kürbissuppe", "Halloween-Party", "Vogelscheuche", "Sensenmann", "Frankenstein", "Dracula", "Gruselclown", "Fluch", "Gruselgeschichte", "Horrorfilm", "Wahrsagerin", "Kristallkugel", "Süßes oder Saures", "Kürbiskerne", "Totengräber", "Leichenwagen", "Geisterstunde", "Fledermausflügel", "Knoblauch", "Kürbislaterne", "Hexenkessel", "Hexenbesen", "Zauberspruch", "Vollmondnacht", "Spukschloss", "Gespensterjagd", "Grabkerze", "Friedhofsmauer", "Kostümparty", "Schminke", "Kunstblut", "Gummispinne", "Plastikskelett", "Deko", "Kerzenleuchter", "Spieluhr", "Schaukelstuhl", "Dachbodenfenster", "Kellertreppe", "Geheimgang", "Falltür", "Ritterrüstung", "Burggespenst", "Moorleiche", "Irrlicht", "Werwolfheulen", "Silberkugel", "Holzpflock", "Sargnagel", "Ketten", "Folterkammer", "Verlies", "Hexenhaus", "Lebkuchenhaus", "Giftapfel", "Fliegenpilz", "Kräuterhexe", "Besenstiel", "Schwarzer Kater", "Hexenmeister", "Magier", "Totenmaske", "Grabräuber", "Schatzkarte", "Geisterschiff", "Seemonster", "Ungeheuer", "Drache", "Troll", "Kobold", "Gnom", "Banshee", "Schlafwandler", "Gänsehautmoment", "Schreckmoment", "Angsthase", "Mutprobe", "Lagerfeuer", "Taschenlampenlicht", "Stromausfall", "Kürbisfeld", "Erntedank", "Herbstlaub", "Maisfeld", "Strohballen", "Heuwagen", "Apfeltauchen", "Bonbontüte", "Zuckerwatte", "Karamellapfel", "Klingelstreich", "Nachbarschaft", "Verkleidung"],
+      3: ["Poltergeist", "Ouija-Brett", "Voodoo-Puppe", "Exorzismus", "Séance", "Besessenheit", "Irrlichtfeuer", "Schlafparalyse", "Déjà-vu", "Día de los Muertos", "Jumpscare", "Pumpkin Spice Latte", "Zombie-Apokalypse", "Halloween-Kater", "Gruppenkostüm", "True-Crime-Podcast", "Escape Room", "Bermudadreieck", "Lebendig begraben", "Verfluchte Puppe", "Geisterjäger", "Kopfloser Reiter", "Bloody Mary", "Stranger Things", "Addams Family", "Freitag der 13.", "Hexenprozess", "Horror-Marathon", "Samhain", "Allerheiligen", "Totensonntag", "Nahtoderfahrung", "Paranormal", "Übersinnlich", "Medium", "Hellseher", "Aberglaube", "Wiedergänger", "Untoter", "Nosferatu", "Graf Dracula", "Transsilvanien", "Frankensteins Monster", "Dr. Jekyll und Mr. Hyde", "Sleepy Hollow", "Hocus Pocus", "Ghostbusters", "Nightmare Before Christmas", "Beetlejuice", "Wednesday", "Chucky", "Pennywise", "Freddy Krueger", "Scream-Maske", "The Shining", "Der Exorzist", "Blair Witch", "Twilight", "Harry Potter", "Gruselkabinett", "Wachsfigurenkabinett", "Geisterstadt", "Friedhofsgärtner", "Bestatter", "Krematorium", "Mausoleum", "Katakomben", "Sarkophag", "Pharaonenfluch", "Golem", "Doppelgänger", "Spiegelwelt", "Zeitschleife", "Parallelwelt", "Fegefeuer", "Unterwelt", "Hades", "Seelenwanderung", "Wiedergeburt", "Totenbeschwörung", "Hexensabbat", "Walpurgisnacht", "Blutmond", "Sonnenfinsternis", "Sternzeichen", "Horoskop", "Tarot", "Glücksbringer", "Pechsträhne", "Schwarzer Freitag", "Horrorclown", "Gänsehaut-Garantie", "Gruselfaktor", "Mutprobe im Spukhaus", "Schreckstarre", "Kürbis-Gewürz", "Halloween-Playlist", "Kostüm-Fail", "Ektoplasma"]
     },
     Z: {
-      1: ["Kürbis","Geist","Hexenhut","Fledermaus","Spinne","Besen","Sarg","Grabstein","Mond","Skelett","Totenkopf","Kerze","Knochen","Spinnennetz","Schwarze Katze","Eule","Kessel","Zauberstab","Bonbon","Maske","Mumie","Auge","Rabe","Kreuz","Schloss","Kahler Baum","Zahn","Fliegenpilz","Apfel","Laterne"],
-      2: ["Hexe auf dem Besen","Vampir","Zombie","Werwolf","Spukhaus","Friedhof","Kürbislaterne","Vogelscheuche","Fledermaus vor dem Mond","Sensenmann","Frankenstein","Zaubertrank","Fangzähne","Geisterbahn","Süßigkeitentüte","Spinne am Faden","Kristallkugel","Gespenst unterm Bettlaken","Monster unterm Bett","Schaufel im Grab","Kerzenleuchter","Axt","Kettensäge","Krähe auf dem Zaun","Hand aus dem Grab","Augapfel","Blutstropfen","Teufel","Vampir im Sarg","Hexenkessel"],
-      3: ["Süßes oder Saures","Geisterstunde","Vollmondnacht","Ouija-Brett","Voodoo-Puppe","Zombie-Apokalypse","Poltergeist","Albtraum","Gänsehaut","Halloween-Party","Kostümwettbewerb","Geist im Spiegel","Wahrsagerin","Mumie wird ausgewickelt","Werwolf-Verwandlung","Lebendig begraben","Leichenwagen","Ghostbusters","Addams Family","Kopfloser Reiter","Geisterschiff","Gruselkabinett","Irrlicht im Moor","Escape Room","Totengräber","Exorzismus","Fluch","Halloween-Kater","Pumpkin Spice Latte","Apfeltauchen"]
+      1: ["Kürbis", "Geist", "Hexenhut", "Fledermaus", "Spinne", "Besen", "Sarg", "Grabstein", "Mond", "Skelett", "Totenkopf", "Kerze", "Knochen", "Spinnennetz", "Schwarze Katze", "Eule", "Kessel", "Zauberstab", "Bonbon", "Maske", "Mumie", "Auge", "Rabe", "Kreuz", "Schloss", "Kahler Baum", "Zahn", "Fliegenpilz", "Apfel", "Laterne", "Lutscher", "Schlüssel", "Tür", "Fenster", "Haus", "Wolke", "Blitz", "Stern", "Sonne", "Regen", "Blatt", "Pilz", "Schlange", "Ratte", "Wurm", "Frosch", "Krähe", "Wolf", "Hund", "Maus", "Fisch", "Vogel", "Herz", "Stuhl", "Bett", "Tisch", "Glas", "Flasche", "Becher", "Löffel", "Messer", "Gabel", "Teller", "Topf", "Hut", "Krone", "Brille", "Schuh", "Socke", "Handschuh", "Hand", "Fuß", "Nase", "Mund", "Ohr", "Kette", "Glocke", "Uhr", "Spiegel", "Buch", "Brief", "Taschenlampe", "Feuer", "Baum", "Zaun", "Weg", "Brücke", "Berg", "Hügel", "Mauer", "Turm", "Schaufel", "Axt", "Säge", "Leiter", "Seil", "Eimer", "Pfeil", "Schere"],
+      2: ["Hexe auf dem Besen", "Vampir", "Zombie", "Werwolf", "Spukhaus", "Friedhof", "Kürbislaterne", "Vogelscheuche", "Fledermaus vor dem Mond", "Sensenmann", "Frankenstein", "Zaubertrank", "Fangzähne", "Geisterbahn", "Süßigkeitentüte", "Spinne am Faden", "Kristallkugel", "Gespenst unterm Bettlaken", "Monster unterm Bett", "Schaufel im Grab", "Kerzenleuchter", "Kettensäge", "Krähe auf dem Zaun", "Hand aus dem Grab", "Augapfel", "Blutstropfen", "Teufel", "Vampir im Sarg", "Hexenkessel", "Clown mit Luftballon", "Pirat mit Augenklappe", "Schwarze Katze auf dem Dach", "Eule auf dem Ast", "Mumie mit Binden", "Skelett auf der Bank", "Geist im Fenster", "Kürbis mit Gesicht", "Zauberer mit Hut", "Drache", "Ungeheuer im See", "Spinne im Netz", "Ratte im Keller", "Kerze im Fenster", "Schloss auf dem Berg", "Burg mit Turm", "Brücke im Nebel", "Mond hinter Wolken", "Sterne über dem Friedhof", "Totenkopf mit Knochen", "Giftflasche", "Gruselmaske", "Hexennase", "Zaubererbart", "Vampirumhang", "Werwolf heult", "Grab mit Kreuz", "Sarg mit Deckel", "Kürbisfeld", "Maisfeld mit Vogelscheuche", "Apfel mit Wurm", "Pilzkreis", "Hexenhaus im Wald", "Spieluhr", "Schaukelstuhl", "Kronleuchter", "Ritterrüstung", "Truhe mit Schatz", "Geisterschiff", "Laterne im Nebel", "Rabe auf dem Schädel", "Spinnenbein", "Schlange um den Ast", "Frosch im Kessel", "Besen in der Ecke", "Kostüm", "Kerze mit Wachstropfen", "Schatten an der Wand", "Fußspuren", "Kratzspuren", "Zerbrochener Spiegel", "Uhr schlägt zwölf", "Glocke im Turm", "Tür mit Schloss", "Keller mit Treppe", "Dachboden mit Spinnweben", "Taschenlampe im Dunkeln", "Lagerfeuer", "Zelt im Wald", "Hütte im Wald", "Brunnen", "Galgen", "Kreuzung im Nebel", "Gruselbaum mit Gesicht", "Blitz über dem Schloss", "Gewitterwolke", "Fledermausschwarm", "Halloween-Party", "Kürbissuppe", "Hexe mit Katze"],
+      3: ["Süßes oder Saures", "Geisterstunde", "Vollmondnacht", "Ouija-Brett", "Voodoo-Puppe", "Zombie-Apokalypse", "Poltergeist", "Albtraum", "Gänsehaut", "Kostümwettbewerb", "Geist im Spiegel", "Wahrsagerin", "Mumie wird ausgewickelt", "Werwolf-Verwandlung", "Lebendig begraben", "Leichenwagen", "Ghostbusters", "Addams Family", "Kopfloser Reiter", "Gruselkabinett", "Irrlicht im Moor", "Escape Room", "Totengräber", "Exorzismus", "Fluch", "Halloween-Kater", "Pumpkin Spice Latte", "Apfeltauchen", "Mutprobe", "Stromausfall", "Schreckmoment", "Angsthase", "Gruselgeschichte am Lagerfeuer", "Klingelstreich", "Hexenprozess", "Séance", "Schlafwandler", "Spuk im Kinderzimmer", "Monster im Kleiderschrank", "Vampir beim Zahnarzt", "Zombie im Supermarkt", "Hexe im Stau", "Skelett im Fitnessstudio", "Geist im Homeoffice", "Mumie in der Badewanne", "Dracula beim Blutspenden", "Werwolf beim Friseur", "Gespenst mit Schluckauf", "Sensenmann macht Pause", "Frankenstein beim Arzt", "Kürbis-Bowling", "Gruppenkostüm", "Horrorfilm-Abend", "Geisterbahn-Fahrt", "Spukschloss-Führung", "Nachtwanderung", "Grusel-Selfie", "Halloween-Umzug", "Friedhof bei Nacht", "Bermudadreieck", "Déjà-vu", "Zeitreise", "Doppelgänger", "Fegefeuer", "Unterwelt", "Totenreich", "Seelenverkauf", "Teufelspakt", "Hexensabbat", "Blutmond", "Sonnenfinsternis", "Sternschnuppe", "Wunsch", "Glück", "Pech", "Freitag der 13.", "Schwarze Katze bringt Unglück", "Spiegel zerbrochen", "Leiter nicht unterqueren", "Aberglaube", "Horoskop", "Tarotkarten", "Hellseherin", "Medium", "Besessenheit", "Exorzist", "Weihwasser", "Silberkugel im Lauf", "Holzpflock und Hammer", "Knoblauchkranz", "Kreuz an der Tür", "Salzkreis", "Schutzamulett", "Traumfänger", "Gruselmusik", "Kürbiswettbewerb", "Zombie-Fußball", "Spinne im Abfluss", "Vampir mit Sonnenbrand"]
     }
   };
 
   var KEY = "spukwort.v2";
-  function emptyDecks() { var d = {}; MODES.forEach(function (m) { d[m] = { 1: [], 2: [], 3: [] }; }); return d; }
+  function emptyDecks() { var d = {}; TABS.forEach(function (m) { d[m] = { 1: [], 2: [], 3: [] }; }); return d; }
   var state = {
     lists: null,
     source: "Standardliste",
@@ -345,7 +471,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
       var s = JSON.parse(raw);
       if (s && s.lists && valid(s.lists)) { state.lists = s.lists; state.source = s.source || "Eigene Liste"; }
       if (s && s.decks) state.decks = s.decks;
-      if (s && MODES.indexOf(s.mode) >= 0) state.mode = s.mode;
+      if (s && TABS.indexOf(s.mode) >= 0) state.mode = s.mode;
       if (s && typeof s.duration === "number") state.duration = s.duration;
       if (s && typeof s.sound === "boolean") state.sound = s.sound;
     } catch (e) {}
@@ -361,7 +487,10 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
     return total > 0;
   }
   function lists() { return state.lists || DEFAULT; }
-  function list(m, l) { return lists()[m][l]; }
+  function list(m, l) {
+    if (m === "G") { var g = lists().G; return (g && Array.isArray(g[1]) && g[1].length) ? g[1] : DEFAULT_GAMES; }
+    return lists()[m][l];
+  }
 
   // ---------- Ziehen ohne Wiederholung ----------
   function shuffle(n) {
@@ -372,7 +501,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
   }
   function sanitizeDecks() {
     if (!state.decks || typeof state.decks !== "object") state.decks = emptyDecks();
-    MODES.forEach(function (m) {
+    TABS.forEach(function (m) {
       if (!state.decks[m]) state.decks[m] = { 1: [], 2: [], 3: [] };
       for (var l = 1; l <= 3; l++) {
         var n = list(m, l).length;
@@ -406,17 +535,18 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
       '<ellipse cx="20" cy="10" rx="10" ry="8" fill="#dcd2b6"/><path d="M14 4 Q20 10 14 16 M20 2.5 Q26 10 20 17.5" stroke="rgba(0,0,0,.25)" stroke-width="2" fill="none"/></svg>';
   }
   function candies(n) { var s = ""; for (var i = 0; i < n; i++) s += candySVG(); return s; }
-  document.querySelectorAll(".lv").forEach(function (b) { b.querySelector(".candies").innerHTML = candies(+b.getAttribute("data-l")); });
+  document.querySelectorAll(".lv[data-l]").forEach(function (b) { b.querySelector(".candies").innerHTML = candies(+b.getAttribute("data-l")); });
 
   function applyMode() {
-    var r = document.documentElement.style, sh = MODE_SHADES[state.mode];
+    var r = document.documentElement.style, sh = MODE_SHADES[state.mode], solo = state.mode === "G";
+    document.querySelector(".levels").classList.toggle("solo", solo);
     r.setProperty("--mode", sh[1]); r.setProperty("--l1", sh[0]); r.setProperty("--l2", sh[1]); r.setProperty("--l3", sh[2]);
     document.querySelectorAll(".tab").forEach(function (t) {
       var on = t.getAttribute("data-m") === state.mode;
       t.setAttribute("aria-selected", String(on));
       t.tabIndex = on ? 0 : -1;
     });
-    document.querySelectorAll(".lv").forEach(function (b) {
+    document.querySelectorAll(".lv[data-l]").forEach(function (b) {
       var l = b.getAttribute("data-l");
       b.setAttribute("aria-label", MODE_NAME[state.mode] + ", Stufe " + l + " ziehen");
     });
@@ -424,7 +554,9 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
   }
 
   function updateCounts() {
-    for (var l = 1; l <= 3; l++) {
+    var gT = list("G", 1).length, gL = state.decks.G[1].length || gT;
+    $("leftG").textContent = gL + "/" + gT;
+    if (state.mode !== "G") for (var l = 1; l <= 3; l++) {
       var total = list(state.mode, l).length;
       var left = state.decks[state.mode][l].length || total;
       $("left" + l).textContent = total ? left + "/" + total : "leer";
@@ -434,22 +566,46 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
       g += '<div class="rl">' + MODE_NAME[m] + "</div>";
       for (var l = 1; l <= 3; l++) { var n = list(m, l).length; g += '<div class="n' + (n ? "" : " zero") + '">' + n + "</div>"; }
     });
+    g += '<div class="rl">Gruppenspiele</div><div class="n wide">' + gT + "</div>";
     $("grid9").innerHTML = g;
     $("source").textContent = "Aktive Liste: " + state.source;
   }
 
   var covered = false;
+  var subEl = $("sub"), artEl = $("art");
   function idle() {
     covered = false;
     card.classList.remove("covered");
     wordEl.className = "word idle";
-    wordEl.textContent = "Tippe rechts auf 1, 2 oder 3";
+    subEl.hidden = true; artEl.hidden = true; artEl.innerHTML = "";
     tagEl.innerHTML = '<span class="mode-name">' + MODE_NAME[state.mode] + "</span>";
-    hintEl.textContent = "1 = leicht · 2 = mittel · 3 = knifflig";
+    if (state.mode === "G") {
+      wordEl.textContent = "Tippe rechts auf „Spiel ziehen“";
+      hintEl.textContent = "Ein zufälliges Gruppenspiel für das ganze Team";
+    } else {
+      wordEl.textContent = "Tippe rechts auf 1, 2 oder 3";
+      hintEl.textContent = "1 = leicht · 2 = mittel · 3 = knifflig";
+    }
+  }
+  function showGame() {
+    var r = draw("G", 1);
+    covered = false;
+    card.classList.remove("covered");
+    var m = /^(.*?)\s*\((.+)\)\s*$/.exec(r.word), title = m ? m[1] : r.word, desc = m ? m[2] : "";
+    var art = artFor(title);
+    tagEl.innerHTML = '<span class="mode-name">Gruppenspiel</span>' + (art.who ? " · " + art.who : "");
+    artEl.innerHTML = art.svg; artEl.hidden = false;
+    wordEl.className = "word" + (title.length > 18 ? " long" : "");
+    wordEl.textContent = title;
+    subEl.textContent = desc; subEl.hidden = !desc;
+    hintEl.textContent = r.reshuffled ? "Alle Spiele waren dran, neu gemischt." : "Antippen zum Verdecken";
+    card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
+    updateCounts();
   }
   function show(level) {
     var m = state.mode, r = draw(m, level);
     covered = false;
+    subEl.hidden = true; artEl.hidden = true; artEl.innerHTML = "";
     card.classList.remove("covered");
     if (r.empty) {
       wordEl.className = "word idle";
@@ -476,14 +632,15 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
     });
     t.addEventListener("keydown", function (e) {
       if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-      var i = MODES.indexOf(state.mode) + (e.key === "ArrowRight" ? 1 : 2);
-      state.mode = MODES[i % 3]; save(); applyMode(); idle();
+      var i = TABS.indexOf(state.mode) + (e.key === "ArrowRight" ? 1 : TABS.length - 1);
+      state.mode = TABS[i % TABS.length]; save(); applyMode(); idle();
       document.querySelector('.tab[data-m="' + state.mode + '"]').focus();
     });
   });
-  document.querySelectorAll(".lv").forEach(function (b) {
+  document.querySelectorAll(".lv[data-l]").forEach(function (b) {
     b.addEventListener("click", function () { unlockAudio(); show(+b.getAttribute("data-l")); });
   });
+  $("gameBtn").addEventListener("click", function () { unlockAudio(); showGame(); });
   card.addEventListener("click", function () {
     if (wordEl.classList.contains("idle")) return;
     covered = !covered;
@@ -621,6 +778,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
     var map = [], found = 0;
     header.forEach(function (h, i) {
       h = (h || "").toLowerCase();
+      if (/grupp|spiel/.test(h) && !/panto/.test(h)) { map[i] = { m: "G", l: 1 }; found++; return; }
       var m = /panto/.test(h) ? "P" : /(erkl|beschr)/.test(h) ? "E" : /zeich|mal/.test(h) ? "Z" : null;
       var lv = (h.match(/[123]/) || [])[0];
       if (m && lv) { map[i] = { m: m, l: +lv }; found++; }
@@ -628,6 +786,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
     if (found) return { map: map, header: true };
     if (width >= 9) {
       for (var i = 0; i < 9; i++) map[i] = { m: MODES[Math.floor(i / 3)], l: (i % 3) + 1 };
+      if (width >= 10) map[9] = { m: "G", l: 1 };
       return { map: map, header: /stufe|level|[123]/i.test(header.join(" ")) };
     }
     // alte 3-Spalten-Tabelle: gilt für alle Disziplinen
@@ -635,7 +794,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
     return { map: map, header: /stufe|level|^\s*[123]\s*$/i.test(header.slice(0, 3).join("|")) };
   }
   function rowsToLists(rows) {
-    var out = {}; MODES.forEach(function (m) { out[m] = { 1: [], 2: [], 3: [] }; });
+    var out = {}; TABS.forEach(function (m) { out[m] = { 1: [], 2: [], 3: [] }; });
     if (!rows.length) return out;
     var width = rows.reduce(function (a, r) { return Math.max(a, r.length); }, 0);
     var cm = columnMap(rows[0], width), seen = {};
@@ -644,7 +803,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
       cm.map.forEach(function (t, i) {
         if (!t) return;
         var v = (r[i] || "").replace(/\s+/g, " ").trim();
-        if (!v || v.length > 80) return;
+        if (!v || v.length > (t.m === "G" ? 200 : 80)) return;
         if (t.all) MODES.forEach(function (m) { add(m, t.l, v); }); else add(t.m, t.l, v);
       });
     });
@@ -667,7 +826,7 @@ button:focus-visible { outline: 3px solid var(--bone); outline-offset: 3px; }
         save(); updateCounts(); idle();
         var empty = [];
         MODES.forEach(function (m) { for (var k = 1; k <= 3; k++) if (!l[m][k].length) empty.push(MODE_NAME[m] + " " + k); });
-        msg("Geladen." + (empty.length ? " Leer: " + empty.join(", ") + "." : ""), !empty.length);
+        msg("Geladen." + (empty.length ? " Leer: " + empty.join(", ") + "." : "") + (l.G[1].length ? " " + l.G[1].length + " Gruppenspiele." : " Keine Gruppenspiele-Spalte, die Standardspiele bleiben aktiv."), !empty.length);
       } catch (err) {
         msg("Die Datei ließ sich nicht auswerten. Bitte als CSV exportieren.", false);
       }
